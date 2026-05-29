@@ -2,8 +2,8 @@ import { useRef, useEffect } from "react";
 
 const MAP_W = 200;
 const MAP_H = 150;
-const CANVAS_W = 1200;
-const CANVAS_H = 1000;
+const CANVAS_W = 1800;
+const CANVAS_H = 1500;
 
 export default function MiniMap({ words, camera, onNavigate }) {
   const canvasRef = useRef(null);

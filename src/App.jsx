@@ -8,6 +8,7 @@ import ConnectionLines from "./components/ConnectionLines";
 import MiniMap from "./components/MiniMap";
 import BottomNav from "./components/BottomNav";
 import Sidebar from "./components/Sidebar";
+import PhoneCardView from "./components/PhoneCardView";
 
 const WORDS = Words;
 const EDGES = graphEdges;
@@ -18,6 +19,7 @@ function KnowledgeGraph() {
   const [activeMorpheme, setActiveMorpheme] = useState(null);
   const [unknownWords, setUnknownWords] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewMode, setViewMode] = useState("overview"); // "overview" | "card"
 
   const activeWord = useMemo(
     () => WORDS.find(w => w.id === activeWordId),
@@ -66,6 +68,40 @@ function KnowledgeGraph() {
     flyTo(target, 500);
   }, [flyTo]);
 
+  const handleCardMode = useCallback(() => {
+    setViewMode(m => m === "card" ? "overview" : "card");
+    setSidebarOpen(false);
+  }, []);
+
+  const handleBackFromCard = useCallback(() => {
+    setViewMode("overview");
+  }, []);
+
+  // Card mode
+  if (viewMode === "card") {
+    return (
+      <div className="app">
+        <PhoneCardView
+          initialWordId={activeWordId || WORDS[0].id}
+          onBack={handleBackFromCard}
+        />
+        <BottomNav
+          onOverview={handleOverview}
+          onToggleSidebar={() => setSidebarOpen(o => !o)}
+          onCardMode={handleCardMode}
+          unknownCount={unknownWords.length}
+          isCardMode={true}
+        />
+        <Sidebar
+          unknownWords={unknownWords}
+          onWordClick={(w) => handleWordClick(w)}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <div
@@ -109,7 +145,9 @@ function KnowledgeGraph() {
       <BottomNav
         onOverview={handleOverview}
         onToggleSidebar={() => setSidebarOpen(o => !o)}
+        onCardMode={handleCardMode}
         unknownCount={unknownWords.length}
+        isCardMode={false}
       />
 
       <Sidebar

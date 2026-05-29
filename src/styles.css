@@ -37,10 +37,10 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 2000px;
-  height: 2000px;
-  margin-left: -1000px;
-  margin-top: -1000px;
+  width: 3200px;
+  height: 3200px;
+  margin-left: -1600px;
+  margin-top: -1600px;
   transform-origin: center center;
   cursor: grab;
   user-select: none;
@@ -322,8 +322,209 @@ body {
   gap: 6px;
 }
 
-.bottom-nav button:hover {
-  background: rgba(255, 255, 255, 0.1);
+.bottom-nav button.nav-active {
+  background: rgba(96, 165, 250, 0.2);
+  color: var(--accent-blue);
+}
+
+/* ---- Phone Card View ---- */
+
+.phone-card-shell {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.phone-card-container {
+  width: 375px;
+  height: 620px;
+  position: relative;
+  perspective: 1000px;
+  perspective-origin: center center;
+}
+
+/* Ghost layer */
+.ghost-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.ghost-layer.visible {
+  opacity: 1;
+}
+
+.ghost-card {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  text-align: center;
+  min-width: 70px;
+}
+
+.ghost-card:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translate(-50%, -50%) scale(1.15);
+  z-index: 2;
+}
+
+.ghost-card-word {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ghost-card-affix {
+  font-size: 0.65rem;
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+/* Main phone card */
+.phone-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 320px;
+  transform: translate(-50%, -50%);
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: 36px 32px;
+  text-align: center;
+  z-index: 5;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.35s ease;
+}
+
+/* Fly out animations */
+.phone-card.card-fly-out-left {
+  animation: flyOutLeft 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.phone-card.card-fly-out-right {
+  animation: flyOutRight 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.phone-card.card-fly-in {
+  animation: flyIn 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes flyOutLeft {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-200%, -50%) scale(0.7) rotateY(-20deg); opacity: 0; }
+}
+
+@keyframes flyOutRight {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(150%, -50%) scale(0.7) rotateY(20deg); opacity: 0; }
+}
+
+@keyframes flyIn {
+  0% { transform: translate(-50%, -50%) scale(0.7) rotateY(15deg); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1) rotateY(0deg); opacity: 1; }
+}
+
+.phone-card-tag {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(96, 165, 250, 0.2);
+  color: var(--accent-blue);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.phone-card-word {
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  line-height: 1;
+}
+
+.phone-card-phonetic {
+  color: var(--accent-blue);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.phone-card-meaning {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.phone-card-example {
+  color: var(--text-secondary);
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 18px;
+}
+
+.phone-card-morphemes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* Swipe layer */
+.swipe-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+.phone-card-hint {
+  position: absolute;
+  bottom: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.phone-back-btn {
+  margin-top: 60px;
+  padding: 10px 24px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.phone-back-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
   color: var(--text-primary);
 }
 
