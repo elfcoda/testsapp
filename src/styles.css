@@ -346,6 +346,9 @@ body {
   position: relative;
   perspective: 1000px;
   perspective-origin: center center;
+  touch-action: none;
+  cursor: pointer;
+  user-select: none;
 }
 
 /* Ghost layer */
@@ -497,6 +500,11 @@ body {
   cursor: pointer;
   touch-action: none;
   user-select: none;
+  pointer-events: none;
+}
+
+.swipe-layer * {
+  pointer-events: auto;
 }
 
 .phone-card-hint {
@@ -508,6 +516,20 @@ body {
   font-size: 0.78rem;
   white-space: nowrap;
   z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.phone-card-hint.hint-error {
+  color: var(--accent-rose);
+  animation: hintShake 0.4s ease;
+}
+
+@keyframes hintShake {
+  0%, 100% { transform: translateX(-50%); }
+  20% { transform: translateX(calc(-50% - 6px)); }
+  40% { transform: translateX(calc(-50% + 6px)); }
+  60% { transform: translateX(calc(-50% - 4px)); }
+  80% { transform: translateX(calc(-50% + 4px)); }
 }
 
 .phone-back-btn {

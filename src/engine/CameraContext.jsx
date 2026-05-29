@@ -140,6 +140,31 @@ export function CameraProvider({ children }) {
     dragStartRef.current = null;
   }, []);
 
+  // Handle mouse wheel for zoom (cursor-centered)
+  const handleWheel = useCallback((e) => {
+    // Cancel any in-flight animation
+    if (animationRefRef.current) {
+      cancelAnimationFrame(animationRefRef.current);
+      animationRefRef.current = null;
+    }
+
+    const zoomSpeed = 0.001;
+    const minScale = 0.2;
+    const maxScale = 4.0;
+
+    setCamera((prev) => {
+      const delta = -e.deltaY * zoomSpeed;
+      const newScale = Math.min(maxScale, Math.max(minScale, prev.scale * (1 + delta)));
+
+      // Zoom toward cursor: adjust x/y so the point under cursor stays fixed
+      const scaleRatio = newScale / prev.scale;
+      const newX = e.clientX - scaleRatio * (e.clientX - prev.x);
+      const newY = e.clientY - scaleRatio * (e.clientY - prev.y);
+
+      return { ...prev, x: newX, y: newY, scale: newScale };
+    });
+  }, []);
+
   // Attach window-level event listeners for mousemove/mouseup
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
@@ -166,6 +191,7 @@ export function CameraProvider({ children }) {
     snapTo,
     isDragging,
     handleMouseDown,
+    handleWheel,
   };
 
   return (

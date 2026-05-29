@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Words } from "../data/words";
 import { graphEdges } from "../data/graph";
 import { findBestEdgeByAngle, distance3D } from "../utils/geometry";
@@ -13,7 +13,9 @@ export default function PhoneCardView({ initialWordId, onBack }) {
   const [currentWordId, setCurrentWordId] = useState(initialWordId || WORDS[0].id);
   const [transitioning, setTransitioning] = useState(false);
   const [showGhosts, setShowGhosts] = useState(true);
-  const [transitionDir, setTransitionDir] = useState(null); // "out-left" | "out-right" | null
+  const [transitionDir, setTransitionDir] = useState(null);
+  const [noEdgeHint, setNoEdgeHint] = useState("");
+  const affixStartRef = useRef(null); // { type: "prefix"|"suffix", text: "un-" } or null
 
   const currentWord = useMemo(
     () => WORDS.find(w => w.id === currentWordId),
@@ -38,8 +40,25 @@ export default function PhoneCardView({ initialWordId, onBack }) {
   const handleSwipe = useCallback((angle) => {
     if (transitioning || !currentWord) return;
 
-    const target = findBestEdgeByAngle(currentWord, EDGES, WORDS, angle);
-    if (!target || target.id === currentWord.id) return;
+    // Filter edges if swipe started from a prefix or suffix affix
+    const affixFilter = affixStartRef.current;
+    let candidateEdges = EDGES;
+
+    if (affixFilter) {
+      candidateEdges = EDGES.filter(e => e.sharedMorpheme === affixFilter.text);
+    }
+
+    const target = findBestEdgeByAngle(currentWord, candidateEdges, WORDS, angle);
+    affixStartRef.current = null;
+
+    if (!target || target.id === currentWord.id) {
+      // Show hint when affix-filtered swipe finds no matching edge
+      if (affixFilter) {
+        setNoEdgeHint(`没有更多「${affixFilter.text}」家族单词可跳转`);
+        setTimeout(() => setNoEdgeHint(""), 2000);
+      }
+      return;
+    }
 
     // Determine exit direction
     const dx = target.x - currentWord.x;
@@ -74,7 +93,11 @@ export default function PhoneCardView({ initialWordId, onBack }) {
 
   return (
     <div className="phone-card-shell">
-      <div className="phone-card-container">
+      <div
+        className="phone-card-container"
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+      >
         {/* Ghost cards layer */}
         <div className={`ghost-layer ${showGhosts ? "visible" : ""}`}>
           {connectedWords.map(w => (
@@ -111,21 +134,22 @@ export default function PhoneCardView({ initialWordId, onBack }) {
 
           <div className="phone-card-morphemes">
             {currentWord.morphemes.map(m => (
-              <AffixChip key={m.text} morpheme={m} />
+              <AffixChip
+                key={m.text}
+                morpheme={m}
+                onPointerDown={() => {
+                  if (m.type === "prefix" || m.type === "suffix") {
+                    affixStartRef.current = { type: m.type, text: m.text };
+                  }
+                }}
+              />
             ))}
           </div>
         </div>
 
-        {/* Swipe detector */}
-        <div
-          className="swipe-layer"
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-        />
-
-        {/* Swipe hint */}
-        <div className="phone-card-hint">
-          ← 往任意方向滑动切换单词 →
+        {/* Hint messages */}
+        <div className={`phone-card-hint ${noEdgeHint ? "hint-error" : ""}`}>
+          {noEdgeHint || "← 往任意方向滑动切换单词 →"}
         </div>
       </div>
 

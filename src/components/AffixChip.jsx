@@ -5,7 +5,7 @@ const TYPE_COLORS = {
   base: { bg: "#f3f4f6", text: "#374151", border: "#d1d5db" },
 };
 
-export default function AffixChip({ morpheme, onClick, compact = false }) {
+export default function AffixChip({ morpheme, onClick, onPointerDown, compact = false }) {
   const colors = TYPE_COLORS[morpheme.type] || TYPE_COLORS.base;
   return (
     <span
@@ -16,6 +16,7 @@ export default function AffixChip({ morpheme, onClick, compact = false }) {
         borderColor: colors.border,
       }}
       onClick={onClick}
+      onPointerDown={onPointerDown}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") onClick(e); } : undefined}

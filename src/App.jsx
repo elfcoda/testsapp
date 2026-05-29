@@ -14,7 +14,7 @@ const WORDS = Words;
 const EDGES = graphEdges;
 
 function KnowledgeGraph() {
-  const { camera, flyTo, handleMouseDown } = useCamera();
+  const { camera, flyTo, handleMouseDown, handleWheel } = useCamera();
   const [activeWordId, setActiveWordId] = useState(null);
   const [activeMorpheme, setActiveMorpheme] = useState(null);
   const [unknownWords, setUnknownWords] = useState([]);
@@ -107,6 +107,7 @@ function KnowledgeGraph() {
       <div
         className="viewport"
         onMouseDown={handleMouseDown}
+        onWheel={handleWheel}
         style={{
           transform: `translate(${camera.x}px, ${camera.y}px) scale(${camera.scale}) rotate(${camera.rotate}deg)`,
         }}
